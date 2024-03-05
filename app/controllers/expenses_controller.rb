@@ -2,66 +2,68 @@ class ExpensesController < ApplicationController
   rescue_from CanCan::AccessDenied do |exception|
     render "shared/access_denied", status: :forbidden
   end
+
   load_and_authorize_resource 
-  before_action :find_user
+
+  before_action :find_user, only: [:index, :new, :create, :edit, :update, :destroy]
   before_action :load_categories, only: [:new, :create, :update]
-  before_action :set_subcategories, only: [:new, :create, :update]
+  before_action :set_subcategories, only: [:new, :create, :update, :edit]
   before_action :set_business_partners, only: [:new, :create, :update]
-  before_action :find_expense, only: [:edit, :update, :destroy]
+  before_action :find_expense, only: [:edit, :update, :destroy, :approve, :cancel]
+  before_action :create_common_flow, only: [:create]
 
-  def index
-    if current_user.super_admin? 
-      @expenses = Expense.includes(:user).all
-    elsif current_user.admin?
-      @expenses = Expense.includes(:user).where.not(user_id: User.where(role: Role.find_by(role_name: 'super_admin')).pluck(:id))
-    else
-      @user = current_user
-      @expenses = current_user.expenses
-    end
-    @expenses = @expenses.paginate(page: params[:page], per_page: 5)
+def index
+  if current_user.super_admin?
+    @expenses = Expense.includes(:user).where(users: { company_id: current_user.company_id })
+  elsif current_user.admin?
+    @expenses = Expense.includes(:user).where(user_id: current_user.company.users.where.not(role_id: Role.find_by(role_name: 'super_admin').id))
+  else
+    @expenses = current_user.expenses
   end
+  @expenses = @expenses.paginate(page: params[:page], per_page: 5)
+end
 
-  def create
-    @subcategories = Subcategory.all
-    @expense = current_user.expenses.new(expense_params)
-    @expense.status = "initiated"
-    
-    if @expense.save
-      flow = Flow.find_or_create_by(user_assigned_id: current_user.id)
-      @expense.update(flow_id: flow.id)
-      
-      if @expense.flow_id.present?
-        flow = Flow.find_by(id: @expense.flow_id)
-        if flow.present? && flow.assigned_user_id.present?
-          ExpenseMailer.notify_assigned_user(flow.id).deliver_now
-        end
-      end
-      redirect_to user_expenses_path, notice: 'Expense was successfully created.'
-    else
-      render :new
-    end
+def create
+  # binding.pry
+  @expense = @user.expenses.new(expense_params)
+  @expense.status = "initiated"
+
+  # Create or find the common flow
+  common_flow = Flow.find_or_create_by(user_assigned_id: current_user.id)
+  common_flow.update(user_assigned_id: current_user.id)
+  common_flow.update(assigned_user_id: params[:assigned_user_id])
+  @expense.flow_id = common_flow.id
+
+  if @expense.save
+    redirect_to user_expenses_path(@user), notice: 'Expense was successfully created.'
+  else
+    render :new
   end
+end
 
-  def show
-    @user = User.find(params[:user_id])
-    @expense = @user.expenses.find(params[:id])
-  end
 
+  
   def new
-    @expense = Expense.new
-    @flow = Flow.find_by(user_assigned_id: user_assigned_id)
+    @expense = @user.expenses.build
+    @users = current_user.company.users
   end
 
   def edit
-    @user = User.find(params[:user_id])
-    @expense = @user.expenses.find(params[:id])
-    @flow = Flow.find_by(user_assigned_id: user_assigned_id)
     @categories = Category.all
     @regular_subcategories = Category.find_by(category_type: 'Regular')&.subcategories
     @travel_subcategories = Category.find_by(category_type: 'Travel')&.subcategories
     @business_partners = BusinessPartner.all
-    @subcategories = Subcategory.all
+    @users = current_user.company.users
   end
+
+  # def update
+  #   if @expense.update(expense_params)
+  #     flash[:notice] = 'Expense was successfully updated'
+  #     redirect_to user_expenses_path(@user)
+  #   else
+  #     render :edit
+  #   end
+  # end
 
   def update
     @expense = Expense.find(params[:id])
@@ -70,7 +72,7 @@ class ExpensesController < ApplicationController
     if current_user.id == @flow.assigned_user_id
       if params[:approve_button]
         update_status_and_redirect(:approved, 'Expense was successfully approved.')
-        ExpenseMailer.notify_super_admin(@expense).deliver_now
+        ExpenseMailer.notify_super_admin(@expense, current_user).deliver_now
       elsif params[:cancel_button]
         update_status_and_redirect(:cancelled, 'Expense was successfully cancelled.')
       else
@@ -82,16 +84,16 @@ class ExpensesController < ApplicationController
   end
 
   def approve
-    @expense = Expense.find(params[:id])
     if @expense.update(status: :approved)
       redirect_to user_expenses_path, notice: 'Expense approved successfully.'
+    
     else
       redirect_to user_expenses_path, alert: 'Failed to approve expense.'
     end
   end
 
   def cancel
-    @expense = Expense.find(params[:id])
+    # binding.pry
     if @expense.update(status: :cancelled)
       redirect_to user_expenses_path, notice: 'Expense cancelled successfully.'
     else
@@ -99,12 +101,16 @@ class ExpensesController < ApplicationController
     end
   end
 
+  def show
+    @user = User.find(params[:user_id])
+    @expense = @user.expenses.find(params[:id])
+  end
+
   def destroy
-    @expense = Expense.find(params[:id])
     if @expense.destroy
-      redirect_to user_expenses_path(user_id: current_user.id), notice: 'Expense was successfully destroyed.'
+      redirect_to user_expenses_path(@user), notice: 'Expense was successfully destroyed.'
     else
-      redirect_to user_expense_path(user_id: current_user.id, id: @expense.id), alert: 'Failed to destroy expense.'
+      redirect_to user_expense_path(@user, @expense), alert: 'Failed to destroy expense.'
     end
   end
 
@@ -129,15 +135,12 @@ class ExpensesController < ApplicationController
   end
 
   def find_expense
-    @expense = @user.expenses.find(params[:id])
+    @expense = Expense.find(params[:id])
   end
 
-  def user_assigned_id
-    Flow.pluck(:user_assigned_id)
-  end
-
-  def assigned_user_id
-    Flow.pluck(:assigned_user_id)
+  def create_common_flow
+    @common_flow = Flow.find_or_create_by(user_assigned_id: current_user.id)
+    @common_flow.update(assigned_user_id: params[:expense][:assigned_user_id])
   end
 
   def update_status_and_redirect(status, notice_message)
@@ -168,6 +171,7 @@ class ExpensesController < ApplicationController
     end
   end
 
+  
   def expense_params
     params.require(:expense).permit(:number_of_people, :application_name, :total_amount, :date_of_application, :subcategory_id, :expense_date, :category_id, :start_date, :end_date, :source, :destination, :business_partner_id, :amount, :tax_amount, :status, :receipt, :description, :application_number)
   end

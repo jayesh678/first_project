@@ -105,13 +105,18 @@
           </div>
         <% end %>
 
-        <% if flash[:notice].present? %>
-          <p class="noticify"><%= flash[:notice] %></p>
-        <% end %>
+      `<% if flash[:notice].present? %>
+        <div class="noticify" style="position: fixed; top: 20px; right: 20px;">
+        <%= flash[:notice] %>
+        </div>
+      <% end %>
 
-        <% if flash[:alert].present? %>
-          <p class="alertify"><%= flash[:alert] %></p>
-        <% end %>
+      <% if flash[:alert].present? %>
+        <div class="alertify" style="position: fixed; top: 20px; right: 20px;">
+        <%= flash[:alert] %>
+        </div>
+      <% end %>
+
       </div>
     </div>
   </div>

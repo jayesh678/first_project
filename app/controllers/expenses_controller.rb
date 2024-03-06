@@ -10,7 +10,7 @@ class ExpensesController < ApplicationController
   before_action :set_subcategories, only: [:new, :create, :update, :edit]
   before_action :set_business_partners, only: [:new, :create, :update]
   before_action :find_expense, only: [:edit, :update, :destroy, :approve, :cancel]
-  before_action :create_common_flow, only: [:create]
+  # before_action :create_common_flow, only: [:create]
 
 def index
   if current_user.super_admin?
@@ -24,36 +24,33 @@ def index
 end
 
 def create
-  # binding.pry
   @expense = @user.expenses.new(expense_params)
   @expense.status = "initiated"
+  common_flow = Flow.find_or_create_by(company_id: current_user.company_id)
 
-  # Create or find the common flow
-  common_flow = Flow.find_or_create_by(user_assigned_id: current_user.id)
-  common_flow.update(user_assigned_id: current_user.id)
-  common_flow.update(assigned_user_id: params[:assigned_user_id])
+  # Set the flow_id of the expense
   @expense.flow_id = common_flow.id
+  @expense.initiator_id = current_user.id
 
   if @expense.save
+    common_flow.update(user_assigned_id: current_user.id)
     redirect_to user_expenses_path(@user), notice: 'Expense was successfully created.'
   else
     render :new
   end
 end
-
-
   
-  def new
-    @expense = @user.expenses.build
-    @users = current_user.company.users
-  end
+def new
+  @expense = @user.expenses.build
+  @users = current_user.company.users
+end
 
-  def edit
-    @categories = Category.all
-    @regular_subcategories = Category.find_by(category_type: 'Regular')&.subcategories
-    @travel_subcategories = Category.find_by(category_type: 'Travel')&.subcategories
-    @business_partners = BusinessPartner.all
-    @users = current_user.company.users
+def edit
+  @categories = Category.all
+  @regular_subcategories = Category.find_by(category_type: 'Regular')&.subcategories
+  @travel_subcategories = Category.find_by(category_type: 'Travel')&.subcategories
+  @business_partners = BusinessPartner.all
+  @users = current_user.company.users
   end
 
   # def update
@@ -66,9 +63,11 @@ end
   # end
 
   def update
+    binding.pry
     @expense = Expense.find(params[:id])
-    @flow = Flow.find_by(user_assigned_id: @expense.user_id)
+    @flow = Flow.find_by(user_assigned_id: @expense.initiator_id)
     
+  if current_user.super_admin? || current_user.id == @flow.assigned_user_id 
     if current_user.id == @flow.assigned_user_id
       if params[:approve_button]
         update_status_and_redirect(:approved, 'Expense was successfully approved.')
@@ -82,7 +81,7 @@ end
       update_expense('Expense was successfully updated')
     end
   end
-
+end
   def approve
     if @expense.update(status: :approved)
       redirect_to user_expenses_path, notice: 'Expense approved successfully.'
@@ -138,10 +137,10 @@ end
     @expense = Expense.find(params[:id])
   end
 
-  def create_common_flow
-    @common_flow = Flow.find_or_create_by(user_assigned_id: current_user.id)
-    @common_flow.update(assigned_user_id: params[:expense][:assigned_user_id])
-  end
+  # def create_common_flow
+  #   @common_flow = Flow.find_or_create_by(user_assigned_id: current_user.id)
+  #   @common_flow.update(assigned_user_id: params[:expense][:assigned_user_id])
+  # end
 
   def update_status_and_redirect(status, notice_message)
     if @expense.update(status: status)
@@ -165,9 +164,9 @@ end
     if super_admin
       report = Expense.approved_expenses_report
       ExpenseMailer.approved_expenses_report(super_admin, report).deliver_now
-      puts "Daily expenses report sent to super admin successfully."
+      # puts "Daily expenses report sent to super admin successfully."
     else
-      puts "Super admin not found."
+      # puts "Super admin not found."
     end
   end
 

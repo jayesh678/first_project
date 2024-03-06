@@ -1,10 +1,10 @@
 # app/controllers/flows_controller.rb
 class FlowsController < ApplicationController
-  def index
-    @flows = Flow.all
-  end
+def index
+  @flows = Flow.where(company_id: current_user.company_id)
+end
 
-  def show
+def show
     @flow = Flow.find(params[:id])
   end
 

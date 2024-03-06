@@ -104,10 +104,9 @@
                     </div>
                   <% end %>
                 </div>
-                
-                <!-- Password Confirmation -->
-                <div class="col-md-8">
-                  <%= form.label :password_confirmation, "Password Confirmation", class: "form-label requireded" %>
+            
+                <div class="col-md-6">
+                  <%= form.label :password_confirmation, class: "form-label requireded" %>
                   <%= form.password_field :password_confirmation, class: "form-control required" %>
                   <% if @user.errors[:password_confirmation].any? %>
                     <div class="error-message">
@@ -118,7 +117,7 @@
               </div>
 
               <div class="row mb-3">
-                <!-- Role -->
+               
                 <div class="col-md-4">
                   <%= form.label :role, class: "form-label requireded" %>
                   <%= form.collection_select :role_id, Role.where(role_name: ['admin', 'user']), :id, :role_name, prompt: "Select Role", class: "form-select required" %>
@@ -129,7 +128,7 @@
                   <% end %>
                 </div>
 
-                <!-- Company -->
+                
                 <div class="col-md-4">
                   <%= form.label :company, class: "form-label requireded" %>
                   <%= form.collection_select :company_id, Company.all, :id, :company_name, prompt: "Select Company", class: "form-select required" %>
@@ -138,11 +137,6 @@
                       <b><%= "Company" + " " +@user.errors[:company].join(", ") %></b>
                     </div>
                   <% end %>
-                </div>
-
-                <!-- Additional Column -->
-                <div class="col-md-4">
-                  <!-- Add your additional field here -->
                 </div>
               </div>
 

@@ -65,6 +65,12 @@ class Expense < ApplicationRecord
     errors.add(:end_date, "cannot be before the start date") if end_date < start_date
   end
 
+  def self.approved_expenses_report
+    approved_expenses = where(status: "approved")
+    # You can format the report or process the approved expenses here
+    return approved_expenses
+  end
+
   # def create_common_flow
   #   flow = Flow.find_or_create_by(user_assigned_id: user_id)
   #   @expense.flow_id = flow.id

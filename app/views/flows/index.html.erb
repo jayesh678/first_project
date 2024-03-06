@@ -8,39 +8,71 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background: linear-gradient(135deg, #5DE0E6, #004AAD);
-      min-height: 100vh;
-    }
-    .card-container {
-      width: 80%;
-      margin: 50px auto;
+      font-family: 'Arial', sans-serif;
+      background: radial-gradient(#5DE0E6, #004AAD);
+      margin: 0;
       padding: 20px;
-      background: linear-gradient(135deg, #CDFFD8, #94B9FF);
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    .card-container {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-top: 60px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 8px;
-      text-align: left;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
+      border-spacing: 0;
+      margin-bottom: 20px; 
+     
     }
 
     th {
-      background-color: #4CAF50;
-      color: white;
+      background-color: #007bff;
+      color: #fff;
+      padding: 12px;
+      text-align: left;
+      text-align: center;
     }
 
-    .btn {
-      margin-top: 10px;
+    td {
+      padding: 12px;
+      text-align: center;
     }
+
+    tbody tr:nth-child(even) {
+      background-color: #F6F4F1;
+    }
+
+    a.button {
+      display: inline-block;
+      padding: 8px 12px;
+      text-align: center;
+      text-decoration: none;
+      background-color: #fff;
+      color: #007bff;
+      border-radius: 20px; 
+      border: 2px solid #007bff; /* Add border with blue color */
+      transition: background-color 0.3s ease;
+    }
+    
+
+    a.button:hover {
+      background-color: #0056b3;
+    }
+
   </style>
 </head>
 <body>
@@ -66,9 +98,30 @@
           <td><%= flow.start_date %></td>
           <td><%= flow.end_date %></td>
           <td>
-            <%= link_to "View", flow_path(flow), class: "btn btn-info" %>
-            <%= link_to "Edit", edit_flow_path(flow), class: "btn btn-primary" %>
-            <%= link_to "Delete", flow_path(flow), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger" %>
+            <%= link_to flow_path(flow), class: 'btn btn-primary btn-sm' do %>
+              <i class="fas fa-eye"></i> View
+            <% end %>
+            <% if can? :update, flow %>
+            <%= link_to edit_flow_path(flow), class: 'btn btn-secondary btn-sm', id: 'edit-user-btn' do %>
+              <i class="fas fa-edit"></i> Edit
+            <% end %>
+          <% else %>
+            <%= link_to edit_flow_path(flow), class: 'btn btn-secondary btn-sm disabled', id: 'edit-user-btn-disabled' do %>
+              <i class="fas fa-edit"></i> Edit
+            <% end %>
+          <% end %>
+          
+         
+ 
+          <% if can? :destroy, flow %>
+          <%= link_to flow_path(flow), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm', id: 'delete-user-btn' do %>
+            <i class="fas fa-trash-alt"></i> Delete
+          <% end %>
+        <% else %>
+          <%= link_to flow_path(flow), class: 'btn btn-danger btn-sm disabled', id: 'delete-user-btn-disabled' do %>
+            <i class="fas fa-trash-alt"></i> Delete
+          <% end %>
+        <% end %>
           </td>
         </tr>
       <% end %>

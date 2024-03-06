@@ -13,7 +13,6 @@ class ExpenseMailer < ApplicationMailer
 
 
   def notify_super_admin(expense, current_user)
-    # binding.pry
     @expense = expense
     @super_admin = User.find_by(role: Role.find_by(role_name: 'super_admin'), company_id: current_user.company_id)&.email
     mail(to: @super_admin, subject: 'Expense Approved')

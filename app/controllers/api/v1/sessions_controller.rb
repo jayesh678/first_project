@@ -13,13 +13,12 @@ def create
   end
 end
 
-def expense_listing
-  regular_expenses = Expense.joins(:category).where(categories: { category_type: "Regular" })
-  #binding.pry 
+def expenses_listing
+  regular_expenses = Expense.joins(:category).where(categories: { category_type: "Regular" }) 
   render json: { status: 'success', message: 'These are the regular expenses', data: regular_expenses.map(&:attributes) }, status: :ok
 end
 
-def travel_expense_listing
+def travel_expenses_listing
   travel_expenses = Expense.includes(:category).where(categories: { category_type: "Travel"})
   render json: { status: 'success', message: "These are travel expenses", data: travel_expenses.map(&:attributes)}, status: :ok
 end

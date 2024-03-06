@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  before_save :ensure_authentication_token
   has_one_attached :avatar
   belongs_to :company
   belongs_to :role
@@ -9,6 +10,7 @@ class User < ApplicationRecord
   validates_presence_of :role, if: :new_record?
   validate :blank_space
   after_create :set_default_role
+
   
   attr_accessor :company_code
   attr_accessor :company_name
@@ -16,6 +18,9 @@ class User < ApplicationRecord
   validates :password, presence: true
   validates :firstname, presence: true
   validates :lastname, presence: true
+
+  devise :database_authenticatable, :token_authenticatable, :registerable,
+      :recoverable, :rememberable, :validatable, :confirmable
 
   def super_admin?
     role.role_name == 'super_admin'
@@ -49,7 +54,4 @@ class User < ApplicationRecord
   def set_default_role
     self.role ||= Role.find_by(role_name: 'super_admin')
   end
-
-  devise :database_authenticatable, :registerable,
-      :recoverable, :rememberable, :validatable, :confirmable
 end

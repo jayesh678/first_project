@@ -206,9 +206,8 @@ pagination-links a {
     </table>
   </div>
   <% end %>
-</div>
 
-<div class="pagination-container">
+  <div class="pagination-container">
   <div class="add-user">
     <%= link_to new_user_expense_path(user_id: current_user.id), class: 'button' do %>
       <i class="fas fa-user-plus"></i> Add Expense
@@ -218,12 +217,15 @@ pagination-links a {
   <div class="col-md-auto">
     <div class="digg_pagination">
       <div class="page_info">
-        <%= page_entries_info @users %>
+        <%= page_entries_info @expenses %>
       </div>
-      <%= will_paginate @users, :container => false %>
+      <%= will_paginate @expenses, :container => false %>
     </div>
   </div>
 </div>
+</div>
+
+
 
 </body>
 </html>

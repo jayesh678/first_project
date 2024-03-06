@@ -3,8 +3,8 @@
       namespace :v1, defaults: { format: 'json' } do
         post '/login', to: 'sessions#create'
         delete '/logout', to: 'sessions#destroy'
-        get '/expenses', to: 'sessions#index'
-        get '/travelexpenses', to: 'sessions#index'
+        get '/expenses', to: 'sessions#expenses_listing'
+        get '/travelexpenses', to: 'sessions#travel_expenses_listing'
       end
     end
     

@@ -63,7 +63,6 @@ def edit
   # end
 
   def update
-    binding.pry
     @expense = Expense.find(params[:id])
     @flow = Flow.find_by(user_assigned_id: @expense.initiator_id)
     
@@ -92,7 +91,6 @@ end
   end
 
   def cancel
-    # binding.pry
     if @expense.update(status: :cancelled)
       redirect_to user_expenses_path, notice: 'Expense cancelled successfully.'
     else
@@ -169,7 +167,6 @@ end
       # puts "Super admin not found."
     end
   end
-
   
   def expense_params
     params.require(:expense).permit(:number_of_people, :application_name, :total_amount, :date_of_application, :subcategory_id, :expense_date, :category_id, :start_date, :end_date, :source, :destination, :business_partner_id, :amount, :tax_amount, :status, :receipt, :description, :application_number)

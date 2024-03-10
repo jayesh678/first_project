@@ -128,18 +128,19 @@
                   <% end %>
                 </div>
 
-                
-                <div class="col-md-4">
-                  <%= form.label :company, class: "form-label requireded" %>
-                  <%= form.collection_select :company_id, Company.all, :id, :company_name, prompt: "Select Company", class: "form-select required" %>
-                  <% if @user.errors[:company].any? %>
-                    <div class="error-message">
-                      <b><%= "Company" + " " +@user.errors[:company].join(", ") %></b>
-                    </div>
-                  <% end %>
-                </div>
-              </div>
 
+                <div class="col-md-4">
+                <%= form.label :company_id, class: "form-label requireded" %>
+                <%= form.collection_select :company_id, Company.where(id: current_user.company_id), :id, :company_name, prompt: "Select Company", class: "form-select required" %>
+                <% if @user.errors[:company_id].any? %>
+                  <div class="error-message">
+                    <b><%= "Company" + " " + @user.errors[:company_id].join(", ") %></b>
+                  </div>
+                <% end %>
+              </div>
+              
+              
+              
               <div class="form-field">
                 <%= form.button 'Create User', class: "btn btn-dark" %>
               </div>

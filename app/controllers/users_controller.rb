@@ -41,13 +41,22 @@ class UsersController < ApplicationController
   end
 
   def update
+    # binding.pry
+    
     if @user.update(user_params)
       @user.avatar.attach(params[:user][:avatar]) if params[:user][:avatar]
       redirect_to user_path, notice: 'User was successfully updated.'
     else
+      # Print out errors if the update fails
+      puts "Errors:"
+      @user.errors.full_messages.each do |message|
+        puts message
+      end
+      
       render :edit
     end
   end
+  
 
   def destroy
     @user = User.find(params[:id])

@@ -12,17 +12,20 @@ class ExpensesController < ApplicationController
   before_action :find_expense, only: [:edit, :update, :destroy, :approve, :cancel]
   # before_action :create_common_flow, only: [:create]
 
-def index
-  if current_user.super_admin?
-    @expenses = Expense.includes(:user).where(users: { company_id: current_user.company_id })
-  elsif current_user.admin?
-    @expenses = Expense.includes(:user).where(user_id: current_user.company.users.where.not(role_id: Role.find_by(role_name: 'super_admin').id))
-  else
-    @expenses = current_user.expenses
+  def index
+    assigned_expenses = nil
+  
+    if current_user.super_admin? || (assigned_expenses = Expense.includes(:flow).where(flows: { assigned_user_id: current_user.id }).exists?)
+      @expenses = Expense.includes(:user).where(users: { company_id: current_user.company_id })
+    elsif current_user.admin?
+      @expenses = Expense.includes(:user).where(user_id: current_user.company.users.where.not(role_id: Role.find_by(role_name: 'super_admin').id))
+    else
+      @expenses = current_user.expenses
+    end
+  
+    @expenses = @expenses.paginate(page: params[:page], per_page: 5)
   end
-  @expenses = @expenses.paginate(page: params[:page], per_page: 5)
-end
-
+  
 def create
   @expense = @user.expenses.new(expense_params)
   @expense.status = "initiated"
@@ -64,7 +67,7 @@ def edit
 
   def update
     @expense = Expense.find(params[:id])
-    @flow = Flow.find_by(user_assigned_id: @expense.initiator_id)
+    @flow = Flow.find_by(company_id: current_user.company_id)
     
   if current_user.super_admin? || current_user.id == @flow.assigned_user_id 
     if current_user.id == @flow.assigned_user_id

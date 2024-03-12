@@ -5,9 +5,9 @@ class UsersController < ApplicationController
   end
 
   before_action :set_user, only: [:show, :edit, :update, :destroy]
- 
+  
   def index
-    @users = User.all
+    # @users = User.all
     @user = current_user
     current_company = current_user.company
     @users = current_company.users

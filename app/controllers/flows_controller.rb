@@ -1,5 +1,9 @@
-# app/controllers/flows_controller.rb
 class FlowsController < ApplicationController
+    rescue_from CanCan::AccessDenied do |exception|
+    render "shared/access_denied", status: :forbidden
+  end
+
+  load_and_authorize_resource 
 def index
   @flows = Flow.where(company_id: current_user.company_id)
 end

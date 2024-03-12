@@ -88,4 +88,15 @@ gem 'pagy'
 gem 'font-awesome-sass'
 gem 'whenever', require: false
 gem 'devise-token_authenticatable'
+group :development, :test do
+  gem 'rspec-rails', '~> 6.1.0'
+end
+gem 'factory_bot_rails'
+group :test do
+  gem "capybara"
+end
+gem 'rails-controller-testing'
+
+
+
 

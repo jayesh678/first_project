@@ -10,8 +10,6 @@ class User < ApplicationRecord
   validates_presence_of :role, if: :new_record?
   validate :blank_space
   after_create :set_default_role
-
-  
   attr_accessor :company_code
   attr_accessor :company_name
   validates :email, presence: true
@@ -34,9 +32,9 @@ class User < ApplicationRecord
     role.role_name == 'user'
   end
 
-  def approver?
-    Flow.exists?(assigned_user_id: id)
-  end
+  # def approver?
+  #   Flow.exists?(assigned_user_id: id)
+  # end
   
   private 
 

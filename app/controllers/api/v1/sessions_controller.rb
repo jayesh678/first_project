@@ -14,7 +14,7 @@ def create
 end
 
 def expenses_listing
-  regular_expenses = Expense.joins(:category).where(categories: { category_type: "Regular" }) 
+  regular_expenses = Expense.includes(:category).where(categories: { category_type: "Regular" }) 
   render json: { status: 'success', message: 'These are the regular expenses', data: regular_expenses.map(&:attributes) }, status: :ok
 end
 

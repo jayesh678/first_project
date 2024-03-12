@@ -11,23 +11,6 @@ $(function () {
   setTimeout(removeFlashMessages, flashDurationInSeconds * 1000);
 });
 
-document
-  .getElementById("category-filter")
-  .addEventListener("change", function () {
-    var selectedCategory = this.value;
-    var expenseRows = document.querySelectorAll("#expense-table-body tr");
-
-    expenseRows.forEach(function (row) {
-      var categoryCell = row.querySelector("td:nth-child(6)");
-      var category = categoryCell.textContent.trim();
-
-      if (selectedCategory === "all" || category === selectedCategory) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    });
-  });
 $(document.body).on("click", ".digg_pagination a", function () {
   // window.location.reload();
   setTimeout(function () {

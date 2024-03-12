@@ -20,9 +20,7 @@ def index
   else
     @expenses = current_user.expenses
   end
-  @expenses = @expenses.paginate(page: params[:page], per_page: 5)
-end
-
+  
 def create
   @expense = @user.expenses.new(expense_params)
   @expense.status = "initiated"

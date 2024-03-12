@@ -128,7 +128,7 @@
                   <% end %>
                 </div>
 
-                
+
                 <div class="col-md-4">
                   <%= form.label :company_id, class: "form-label requireded" %>
                 <%= form.collection_select :company_id, Company.where(id: current_user.company_id), :id, :company_name, prompt: "Select Company", class: "form-select required" %>
@@ -138,7 +138,9 @@
                   </div>
                 <% end %>
               </div>
-
+              
+              
+              
               <div class="form-field">
                 <%= form.button 'Create User', class: "btn btn-dark" %>
               </div>

@@ -7,11 +7,9 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
   
   def index
-    # @users = User.all
     @user = current_user
     current_company = current_user.company
-    @users = current_company.users
-    @users = @users.paginate(page: params[:page], per_page: 5)
+    @users = current_company.users.order(created_at: :desc).paginate(page: params[:page], per_page: 5)
   end
 
   def show
@@ -41,8 +39,6 @@ class UsersController < ApplicationController
   end
 
   def update
-    # binding.pry
-    
     if @user.update(user_params)
       @user.avatar.attach(params[:user][:avatar]) if params[:user][:avatar]
       redirect_to user_path, notice: 'User was successfully updated.'
@@ -56,15 +52,11 @@ class UsersController < ApplicationController
       render :edit
     end
   end
-  
 
   def destroy
     @user = User.find(params[:id])
     @user.destroy
-    respond_to do |format|
-      format.html { redirect_to users_path, notice: 'User was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    redirect_to users_path, notice: 'User was successfully destroyed.'
   end
 
   private

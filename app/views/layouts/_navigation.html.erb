@@ -4,21 +4,23 @@
       <div class="container-fluid">
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
           <ul class="navbar-nav ml-3">
-          <li class="nav-item">
-          <%= link_to "SmartFlow", root_path, class: "nav-link font-weight-bold text-light" %>
-        </li>
-        <li class="nav-item">
-          <%= link_to "Users", users_path, class: "nav-link font-weight-bold text-light" %>
-        </li>
-        <% if current_user.role.role_name != "user" %>
-          <li class="nav-item">
-            <%= link_to "Business Partners", business_partners_path, class: "nav-link font-weight-bold text-light" %>
-          </li>
+            <li class="nav-item">
+              <%= link_to "SmartFlow", root_path, class: "nav-link font-weight-bold text-light" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Users", users_path, class: "nav-link font-weight-bold text-light" %>
+            </li>
+            <% if current_user.role.role_name != "user" %>
+              <li class="nav-item">
+                <%= link_to "Business Partners", business_partners_path, class: "nav-link font-weight-bold text-light" %>
+              </li>
             <% end %>
-          <li class="nav-item">
-            <%= link_to "Flows", flows_path, class: "nav-link font-weight-bold text-light" %>
-          </li>
-    
+            <li class="nav-item">
+              <%= link_to "Expenses", user_expenses_path(current_user), class: "nav-link font-weight-bold text-light" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Flows", flows_path, class: "nav-link font-weight-bold text-light" %>
+            </li>
           </ul>
           <div class="user-profile ml-3"> 
             <%= link_to user_path(current_user), class: "nav-link user-link font-weight-bold text-white" do %> 
@@ -36,14 +38,12 @@
   <% end %>
 <% end %>
 
-
-
 <style>
 .user-initials-circle {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: #007bff; /* Or any color you desire */
+  background-color: #007bff;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -1,14 +1,15 @@
 class FlowsController < ApplicationController
-    rescue_from CanCan::AccessDenied do |exception|
+  rescue_from CanCan::AccessDenied do |exception|
     render "shared/access_denied", status: :forbidden
   end
 
   load_and_authorize_resource 
-def index
-  @flows = Flow.where(company_id: current_user.company_id)
-end
 
-def show
+  def index
+    @flows = Flow.where(company_id: current_user.company_id)
+  end
+
+  def show
     @flow = Flow.find(params[:id])
   end
 
@@ -27,27 +28,24 @@ def show
   end
 
   def edit
-    # @expense = Expense.find(params[:id])
     @flow = Flow.find(params[:id])
-    @users_for_dropdown = current_user.company.users.map { |user| [user.firstname, user.id] }
+    @users_for_dropdown = users_for_dropdown
   end
 
   def update
     @flow = Flow.find(params[:id])
-  
+    @users_for_dropdown = users_for_dropdown
+
     if @flow.update(flow_params)
-      # Store the selected assigned_user_id
       assigned_user_id = flow_params[:assigned_user_id]
-  
-      # Update assigned_user_id for all flows
       Flow.update_all(assigned_user_id: assigned_user_id)
-  
+      FlowMailer.flow_updated(@flow).deliver_now
+
       redirect_to @flow, notice: 'Flow was successfully updated.'
     else
       render :edit
     end
   end
-  
 
   def destroy
     @flow = Flow.find(params[:id])

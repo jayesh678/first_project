@@ -10,14 +10,12 @@
       overflow:hidden;
     }
     .card-body {
-    
       background-image: linear-gradient(#CDFFD8, #94B9FF);
       border-radius: 8px;
       padding: 20px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       margin: 20px auto;
       width: 500px;
-      
     }
     .form-group {
       margin-bottom: 20px;
@@ -46,36 +44,33 @@
   </style>
 </head>
 <body>
-
-<div class="card-body">
-  <h5 class="card-title text-center">Expense Information</h5>
-  <div class="mb-3">
-    <div class="form-group">
-      <label for="application_number">Application Number</label>
-      <input type="text" class="form-control" id="application_number" value="<%= @expense.application_number %>" readonly>
-    </div>
-    <div class="form-group">
-      <label for="amount">Amount</label>
-      <input type="text" class="form-control" id="amount" value="<%= @expense.amount %>" readonly>
-    </div>
-    <div class="form-group">
-      <label for="expense_date">Expense Date</label>
-      <input type="text" class="form-control" id="expense_date" value="<%= @expense.expense_date %>" readonly>
-    </div>
-    <div class="form-group">
-      <label for="expense_status">Expense Status</label>
-      <input type="text" class="form-control" id="expense_status" value="<%= @expense.status %>" readonly>
-    </div>
-    <div class="form-group">
-      <label for="receipt">Receipt</label>
-      <%= image_tag @expense.receipt %>
-    </div>
-  
-    <div class="col-md-6 btn-back">
-      <%= link_to 'Back to Expenses', user_expenses_path(@user), class: 'btn btn-secondary' %>
+  <div class="card-body">
+    <h5 class="card-title text-center">Expense Information</h5>
+    <div class="mb-3">
+      <div class="form-group">
+        <label for="application_number">Application Number</label>
+        <input type="text" class="form-control" id="application_number" value="<%= @expense.application_number %>" readonly>
+      </div>
+      <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="text" class="form-control" id="amount" value="<%= @expense.amount %>" readonly>
+      </div>
+      <div class="form-group">
+        <label for="expense_date">Expense Date</label>
+        <input type="text" class="form-control" id="expense_date" value="<%= @expense.expense_date %>" readonly>
+      </div>
+      <div class="form-group">
+        <label for="expense_status">Expense Status</label>
+        <input type="text" class="form-control" id="expense_status" value="<%= @expense.status %>" readonly>
+      </div>
+      <div class="form-group">
+        <label for="receipt">Receipt</label>
+        <%= image_tag @expense.receipt %>
+      </div>
+      <div class="col-md-6 btn-back">
+        <%= link_to 'Back to Expenses', user_expenses_path(@user), class: 'btn btn-secondary' %>
+      </div>
     </div>
   </div>
-</div>
-
 </body>
 </html>

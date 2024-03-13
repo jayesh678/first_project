@@ -1,5 +1,4 @@
 class Users::RegistrationsController < Devise::RegistrationsController
-  # Override the new method to handle company_name parameter
   def new
     build_resource({})
     self.resource.company_name = params[:company_name] if params[:company_name].present?

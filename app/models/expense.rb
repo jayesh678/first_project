@@ -1,30 +1,22 @@
 class Expense < ApplicationRecord
-  # original
   belongs_to :flow
   belongs_to :user
-  # has_many :flows, dependent: :destroy 
-  # belongs_to :initiator, class_name: 'User', foreign_key: 'initiator_id'
-  # belongs_to :approver, class_name: 'User', foreign_key: 'approver_id', optional: true
   belongs_to :business_partner
   belongs_to :category
   has_many :subcategories
-  has_one_attached :receipt 
+  has_one_attached :receipt
+  
   before_create :generate_application_number
-  # after_create :create_common_flow
-  # before_validation :associate_flow, on: :create
 
   enum status: { ideal: 0, initiated: 1, approved: 2, cancelled: 3 }
 
   validates :application_number, uniqueness: true
   validates :application_name, presence: true 
-  # validates :number_of_people, presence: true 
   validates :total_amount, presence: true 
   validates :date_of_application, presence: true
   validates :expense_date, presence: true
   validates :category, presence: true
   validates :business_partner, presence: true
-  # validates :amount, presence: true
-  # validates :tax_amount, presence: true
   validate :non_negative_integer
   validates :description, presence: true
   validates :receipt, presence: true
@@ -66,28 +58,7 @@ class Expense < ApplicationRecord
   end
 
   def self.approved_expenses_report
-    approved_expenses = where(status: "approved")
-    # You can format the report or process the approved expenses here
+    approved_expenses = Expense.where(status: "approved")
     return approved_expenses
   end
-
-  # def create_common_flow
-  #   flow = Flow.find_or_create_by(user_assigned_id: user_id)
-  #   @expense.flow_id = flow.id
-  # end
-  
-
-  #  def associate_flow
-  #   self.flow ||= Flow.find_or_create_by(user_assigned_id: user_id)
-  #   self.flow.update(assigned_user_id: predefined_approver_id)
-  # end
-
-  # def predefined_approver_id
-  #   approver_email = 'xyz@gmail.com'
-  #   approver = User.find_by(email: approver_email)
-  #   approver.id if approver
-  # end
-  # approver_emails = "a@b.com", 'c@d.com'
-  # approver = User.where(email: approver_emails)
-  # approvers.pluck(:id)
 end

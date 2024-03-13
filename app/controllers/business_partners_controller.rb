@@ -5,10 +5,9 @@ class BusinessPartnersController < ApplicationController
   load_and_authorize_resource
   
   def index
-    @business_partners = BusinessPartner.all
-    @business_partners = BusinessPartner.paginate(page: params[:page], per_page: 5)
+    @business_partners = current_user.company.business_partners.order(created_at: :desc).paginate(page: params[:page], per_page: 5)
   end
-  
+
   def show
     @business_partner = BusinessPartner.find(params[:id])
     flash[:alert] = 'Business Partner not found' if @business_partner.nil?
@@ -42,7 +41,7 @@ class BusinessPartnersController < ApplicationController
   end
   
   def create
-    @business_partner = BusinessPartner.new(business_partner_params)
+    @business_partner = current_user.company.business_partners.build(business_partner_params)
     @customer_names = VendorMaster.pluck(:customer_name)
   
     if @business_partner.save
@@ -54,17 +53,17 @@ class BusinessPartnersController < ApplicationController
 
   def fetch_customer_details
     customer_name = params[:customer_name]
-      @customer_details = VendorMaster.where(customer_name: customer_name)
-      flash[:error] = "Vendor Master ID is missing."
-    end
+    @customer_details = VendorMaster.where(customer_name: customer_name)
+    flash[:error] = "Vendor Master ID is missing."
   
     respond_to do |format|
       format.js
     end
+  end
 
   private
   
   def business_partner_params
-    params.require(:business_partner).permit(:vendor_master_id, :customer_name, :customer_code, :corporate_number, :invoice_number, :address, :postal_code, :telephone_number, :bank_name)
+    params.require(:business_partner).permit(:company_id, :customer_name, :customer_code, :corporate_number, :invoice_number, :address, :postal_code, :telephone_number, :bank_name)
   end
 end
